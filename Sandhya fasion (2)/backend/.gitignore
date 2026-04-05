@@ -36,7 +36,3 @@ logs/
 # Temporary files
 *.tmp
 *.temp
-
-# Local MongoDB data (never commit these)
-data/
-data-v2/
