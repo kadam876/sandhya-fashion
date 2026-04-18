@@ -35,7 +35,7 @@ app.use('/api/feedback', feedbackRoutes);
 
 // Health Check
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'UP', message: 'Node.js Express Backend is active - v1.0.2 Verification' });
+    res.json({ status: 'UP', message: 'Node.js Express Backend is active - v1.0.3-Diagnostic-Active' });
 });
 
 // Database and Server Init
