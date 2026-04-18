@@ -54,7 +54,9 @@ async function seed() {
       await admin.save();
       console.log(`✅ Admin created: ${ADMIN_EMAIL}`);
     } else {
-      console.log(`✅ Found admin: ${ADMIN_EMAIL} (id: ${admin._id})`);
+      admin.password = ADMIN_PASSWORD;
+      await admin.save();
+      console.log(`✅ Found and updated admin: ${ADMIN_EMAIL} (id: ${admin._id})`);
     }
 
     const adminId = admin._id.toString();
