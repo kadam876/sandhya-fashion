@@ -31,15 +31,22 @@ const Dashboard = () => {
   }, [salesRange]);
 
   const fetchDashboardData = async () => {
+    console.log('[Dashboard Debug] Starting fetchDashboardData...');
+    console.log('[Dashboard Debug] API_ENDPOINTS.ANALYTICS_DASHBOARD_FULL:', API_ENDPOINTS.ANALYTICS_DASHBOARD_FULL);
+    
     setLoading(true);
     try {
       const h = { headers: getAuthHeaders() };
+      const fetchUrl = `${API_ENDPOINTS.ANALYTICS_DASHBOARD_FULL}?period=${salesRange}`;
+      console.log('[Dashboard Debug] Fetching from:', fetchUrl);
 
       // Try the combined endpoint first (faster), fall back to parallel calls
-      const fullRes = await fetch(`${API_ENDPOINTS.ANALYTICS_DASHBOARD_FULL}?period=${salesRange}`, h);
+      const fullRes = await fetch(fetchUrl, h);
+      console.log('[Dashboard Debug] Combined endpoint response status:', fullRes.status);
 
       if (fullRes.ok) {
         const data = await fullRes.json();
+        console.log('[Dashboard Debug] Successfully fetched full dashboard data');
         setDashboardStats(data.stats);
         setSalesData(data.sales);
         setCategoryData(data.categories);
@@ -47,6 +54,7 @@ const Dashboard = () => {
         setTopProducts(data.topProducts);
         setPredictionData(data.predictions);
       } else {
+        console.warn('[Dashboard Debug] Full dashboard fetch failed, falling back to parallel calls');
         // Fallback: parallel calls (works with old backend)
         const [statsRes, salesRes, categoryRes, statusRes, topRes, predRes] = await Promise.all([
           fetch(API_ENDPOINTS.ADMIN_DASHBOARD, h),
@@ -56,6 +64,14 @@ const Dashboard = () => {
           fetch(`${API_ENDPOINTS.ADMIN_TOP_PRODUCTS}?limit=10`, h),
           fetch(API_ENDPOINTS.ADMIN_PREDICTIONS, h),
         ]);
+        
+        console.log('[Dashboard Debug] Fallback responses:', {
+          stats: statsRes.status,
+          sales: salesRes.status,
+          categories: categoryRes.status,
+          status: statusRes.status
+        });
+
         const [stats, sales, cats, status, top, pred] = await Promise.all([
           statsRes.ok ? statsRes.json() : null,
           salesRes.ok ? salesRes.json() : null,
@@ -74,8 +90,8 @@ const Dashboard = () => {
 
       setError(null);
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-      setError('Failed to load dashboard data. Please try again.');
+      console.error('[Dashboard Debug] Error in fetchDashboardData:', error);
+      setError(`Failed to load dashboard data: ${error.message}. Check console for details.`);
     } finally {
       setLoading(false);
     }
