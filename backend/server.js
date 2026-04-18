@@ -41,7 +41,11 @@ app.get('/api/health', (req, res) => {
 // Database and Server Init
 const PORT = process.env.PORT || 8080;
 
-connectDB().then(() => {
+// Initialize Database
+connectDB();
+
+// Only start the server if not running as a Vercel serverless function
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
     const server = app.listen(PORT, () => {
         console.log(`Server running on port ${PORT}`);
     });
@@ -56,4 +60,7 @@ connectDB().then(() => {
             console.error(e);
         }
     });
-});
+}
+
+// Export the app for Vercel serverless functions
+module.exports = app;
