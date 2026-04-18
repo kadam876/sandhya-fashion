@@ -13,6 +13,7 @@ router.get('/my-users', adminController.getMyUsers);
 router.get('/catalogues', adminController.getCatalogues);
 router.get('/orders', adminController.getOrders);
 router.get('/orders/status/:status', adminController.getOrdersByStatus);
+router.get('/debug-db', adminController.debugDb);
 
 router.post('/products', adminController.addProduct);
 router.put('/products/:id', adminController.updateProduct);

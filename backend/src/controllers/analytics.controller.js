@@ -10,10 +10,14 @@ const getAdminOrderMatch = async (user) => {
 exports.getDashboardStats = async (req, res) => {
     try {
         const user = req.user;
+        console.log(`[DashboardStats] Request by User: ${user.email}, Role: ${user.role}`);
+
         let productMatch = { isActive: true };
         if (user.role?.toUpperCase() !== 'OWNER') productMatch.adminId = user.id;
 
         const totalProducts = await Product.countDocuments(productMatch);
+        console.log(`[DashboardStats] Products found: ${totalProducts}`);
+
         const lowStockItems = await Product.countDocuments({ ...productMatch, stockQuantity: { $lt: 20 } });
         
         const orderMatch = await getAdminOrderMatch(user);
@@ -23,7 +27,9 @@ exports.getDashboardStats = async (req, res) => {
             { $group: { _id: null, total: { $sum: '$totalAmount' } } }
         ]);
         const totalRevenue = revenueResult.length > 0 ? revenueResult[0].total : 0;
+        console.log(`[DashboardStats] Orders: ${totalOrders}, Revenue: ${totalRevenue}`);
         res.json({ totalProducts, totalOrders, lowStockItems, totalRevenue });
+
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

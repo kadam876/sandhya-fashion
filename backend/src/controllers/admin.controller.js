@@ -223,3 +223,32 @@ exports.getPlatformStats = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+exports.debugDb = async (req, res) => {
+    try {
+        const mongoose = require('mongoose');
+        const pCount = await Product.countDocuments();
+        const oCount = await Order.countDocuments();
+        const uCount = await User.countDocuments();
+        
+        const uri = process.env.MONGO_URI || '';
+        const host = uri.includes('@') ? uri.split('@')[1].split('/')[0] : 'not set/local';
+
+        res.json({
+            success: true,
+            database: {
+                host,
+                readyState: mongoose.connection.readyState,
+                counts: {
+                    products: pCount,
+                    orders: oCount,
+                    users: uCount
+                }
+            },
+            serverTime: new Date().toISOString()
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+};
+
